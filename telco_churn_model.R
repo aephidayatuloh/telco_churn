@@ -30,7 +30,10 @@ cv <- telco_train |>
 
 # Simple Model ------------------------------------------------------------
 
-reglog <- glm(churn ~ ., data = telco)
+reglog <- glm(churn ~ ., data = telco_train, family = "binomial")
+reglog |> 
+  summary()
+
 
 # Recipe and data preprocessing ------------------------------------------------
 
