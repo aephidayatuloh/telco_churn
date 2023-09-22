@@ -12,7 +12,9 @@ telco_churn <- read_csv("data/telco/telco_churn_sample.csv")
 set.seed(1001)
 telco_split <- telco_churn |> 
   select(-MSISDN) |> 
-  mutate(churn = factor(churn, levels = c(1, 0), label = c("Yes", "No"))) |> 
+  mutate(churn = factor(churn, 
+                        levels = c(1, 0), 
+                        label = c("Yes", "No"))) |> 
   initial_split(prop = 0.8, strata = churn)
 
 # Data training
@@ -105,7 +107,7 @@ grid_ctrl <- control_race(
 )
 
 # Lakukan pemodelan dan cross validation
-# Membutuhkan waktu yang cukup lama dan komputasi yang berat
+# !!!Membutuhkan waktu yang cukup lama dan komputasi yang berat
 
 telco_models <- telco_set |> 
   workflow_map(fn = "tune_race_anova", 
@@ -119,8 +121,9 @@ telco_models <- telco_set |>
 telco_models |> 
   collect_metrics() |> 
   filter(.metric == "roc_auc") |> 
-  select(wflow_id, .config, model, mean) |> 
-  arrange(desc(mean))
+  select(wflow_id, model, mean) |> 
+  arrange(desc(mean)) |> 
+  print(width = Inf)
 
 # Plot perbandingan model dan pra-prosesnya berdasarkan AUC 
 telco_models |> 
@@ -205,6 +208,7 @@ telco_to_pred |>
     ) |> 
   print(width = Inf)
 
+# Melihat variable importance 
 final_model |> 
   extract_fit_engine() |> 
   vip::vi_model() |> 
